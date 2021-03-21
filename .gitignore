@@ -12,6 +12,7 @@
 *.tar.gz
 *.rar
 
-
+# Local Project Files
 /target/
 .project
+.settings

@@ -10,4 +10,5 @@ public class SharePriceBean {
 	String priceActual; 
 	String var1D;
 	String var1W;
+	String position;
 }

@@ -1,6 +1,10 @@
 package fr.crypto.shareprice.xls;
 
+import static fr.crypto.shareprice.util.CellUtils.writeCell;
 import static fr.crypto.shareprice.util.CellUtils.writeNumericCell;
+import static fr.crypto.shareprice.util.CellUtils.writePercentCell;
+
+import java.util.Date;
 
 import org.apache.poi.ss.usermodel.Sheet;
 
@@ -49,6 +53,10 @@ public class SharePriceRow {
 		return getCellAsTextValue(Constants.COLS.PL_VALUE.value);
 	}
 
+	public String getPosition() {
+		return getCellAsTextValue(Constants.COLS.POSITION.value);
+	}
+
 	public String getVar1D() {
 		return getCellAsTextValue(Constants.COLS.VAR_1D.value);
 	}
@@ -76,10 +84,13 @@ public class SharePriceRow {
 		
 		// Enregistre les infos récupérées
 		writeNumericCell(sheet, rowIndex, Constants.COLS.PRICE_ACTUAL.value, sp.getPriceActual());
-		writeNumericCell(sheet, rowIndex, Constants.COLS.VAR_1D.value, sp.getVar1D());
-		writeNumericCell(sheet, rowIndex, Constants.COLS.VAR_1W.value, sp.getVar1W());
+		writeNumericCell(sheet, rowIndex, Constants.COLS.POSITION.value, sp.getPosition());
+//		writeNumericCell(sheet, rowIndex, Constants.COLS.VAR_1D.value, sp.getVar1D());
+		writePercentCell(sheet.getWorkbook(), sheet, rowIndex, Constants.COLS.VAR_1D.value, String.valueOf(Double.valueOf(sp.getVar1D()) / 100));
+		//writePercentCell(sheet.getWorkbook(), sheet, rowIndex, Constants.COLS.VAR_1W.value, sp.getVar1W());
 
 		// Enregistre les calculs de rendement / variation
+		writeCell(sheet, rowIndex, Constants.COLS.UPDATE_DATE.value, Constants.SDF_EXCEL.format(new Date()));
 		// TODO les calculs de rendement variation
 		
 		//writeCell(sheet, Constants.COLS.ROW_SOCIETY.value, rowIndex, stock.getSociete());

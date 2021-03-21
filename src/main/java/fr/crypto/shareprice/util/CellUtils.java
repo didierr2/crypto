@@ -66,7 +66,7 @@ public class CellUtils {
 		try {
 			Cell cell = writeNumericCell(sheet, rowIndex, colIndex, val);
 			CellStyle style = workbook.createCellStyle();
-			style.setDataFormat(workbook.createDataFormat().getFormat("0%")); //"0.00%"
+			style.setDataFormat(workbook.createDataFormat().getFormat("0.00%")); //"0.00%"
 			cell.setCellStyle(style);
 		}
 		catch (NumberFormatException nfe) {

@@ -6,11 +6,15 @@ import java.io.IOException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
+import fr.crypto.shareprice.importer.CoinMarketCapImporter;
 import fr.crypto.shareprice.importer.SharePriceBean;
+import fr.crypto.shareprice.importer.SharePriceImportable;
 import fr.crypto.shareprice.xls.AbstractWorkbookHandler;
 import fr.crypto.shareprice.xls.SharePriceRow;
 
 // TODO Externaliser les configs dans un fichier properties
+// TODO Gérer les exceptions par ligne
+
 
 public class SharePriceImporterStarter extends AbstractWorkbookHandler {
 
@@ -41,7 +45,7 @@ public class SharePriceImporterStarter extends AbstractWorkbookHandler {
 		SharePriceRow sp = SharePriceRow.first(data);
 		while(sp.isPresent()) {
 			
-			if (true || sp.isUpdatable()) {
+			if (sp.isUpdatable()) {
 				// On effectue l'appel distant
 				SharePriceBean actualSp = loadSharePrice(sp.getUpdateUrl());
 				// On enregistre les infos
@@ -59,12 +63,18 @@ public class SharePriceImporterStarter extends AbstractWorkbookHandler {
 	}
 
 	
-	static int p = 1;
+	SharePriceImportable importer = new CoinMarketCapImporter();
 	private SharePriceBean loadSharePrice(String url) {
 		SharePriceBean sp = new SharePriceBean();
-		sp.setPriceActual("" + p++);
-		sp.setVar1D("0.02");
-		sp.setVar1W("0.05");
+		
+		try {
+			if (importer.isElligible(url)) {
+				sp = importer.importSharePrice(url);
+			}
+		}
+		catch (Exception e) {
+			e.printStackTrace();
+		}
 		
 		/*LogRecorder recorder = new LogRecorder(); 
 		try {

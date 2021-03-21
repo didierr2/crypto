@@ -14,6 +14,10 @@ public final class Constants {
 	
 	public static final int SLEEP_INTERVAL_SECONDS = 2;
 	
+	
+	public static final String URL_CRYPTOAST = "/cryptoast.fr/";
+	public static final String URL_COINMARKETCAP = "/coinmarketcap.com/";
+	
 	public enum SHEETS {
 		DATA(0);
 		
@@ -33,8 +37,9 @@ public final class Constants {
 		PL_VALUE (6),
 		VAR_1D (7),
 		VAR_1W (8),
-		UPDATE_DATE (9),
-		UPDATE_URL (10);
+		POSITION (9),
+		UPDATE_DATE (10),
+		UPDATE_URL (11);
 		
 		public int value = 0;
 		COLS(int n) {
