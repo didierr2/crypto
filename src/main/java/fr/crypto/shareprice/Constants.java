@@ -16,7 +16,8 @@ public final class Constants {
 
 	public static final SimpleDateFormat SDF_EXCEL = new SimpleDateFormat(PropertyManager.getPropertyOrElse("UPDATE_DATE_FORMAT", "dd/MM/yyyy"));
 
-	public static final int FIRST_ROW = PropertyManager.getIntPropertyOrElse("FIRST_ROW", 1);
+	// On fait -1 car la premiere ligne a le numéro 0
+	public static final int FIRST_ROW = PropertyManager.getIntPropertyOrElse("FIRST_ROW", 2) - 1;
 	
 	public static final int SLEEP_INTERVAL_MILLISECONDS = PropertyManager.getIntPropertyOrElse("SLEEP_INTERVAL_MILLISECONDS", 1000);
 	
@@ -33,31 +34,34 @@ public final class Constants {
 	public static final String URL_COURSCRYPTOMONNAIES = "/courscryptomonnaies.com/";
 	
 	public enum SHEETS {
-		DATA(0);
+		DATA ("Feuil1");
 		
-		public int value = 0;
-		SHEETS(int n) {
-			value = PropertyManager.getIntPropertyOrElse(this.getClass().getSimpleName() + "." + this.name(), n);
+		public String value = null;
+		SHEETS(String n) {
+			value = PropertyManager.getPropertyOrElse(this.getClass().getSimpleName() + "." + this.name(), n);
 		}
 	}
 	
 	public enum COLS {
-		NAME (0), 
-		INDEX (1), // INDICE (XBT, ETH)
-		QUANTITY (2),
-		PRICE_BUY (3),
-		PRICE_ACTUAL (4),
-		PL_PERCENT (5),
-		PL_VALUE (6),
-		VAR_1D (7),
-		VAR_1W (8),
-		POSITION (9),
-		UPDATE_DATE (10),
-		UPDATE_URL (11);
+		NAME ("A"), 
+		INDEX ("B"), // INDICE (XBT, ETH)
+		QUANTITY (null),
+		PRICE_BUY (null),
+		PRICE_ACTUAL ("E"),
+		PL_PERCENT (null),
+		PL_VALUE (null),
+		VAR_1D (null),
+		VAR_1W (null),
+		POSITION (null),
+		UPDATE_DATE (null),
+		UPDATE_URL ("L");
 		
-		public int value = 0;
-		COLS(int n) {
-			value = PropertyManager.getIntPropertyOrElse(this.getClass().getSimpleName() + "." + this.name(), n);
+		public String value = null;
+		COLS(String n) {
+			value = PropertyManager.getPropertyOrElse(this.getClass().getSimpleName() + "." + this.name(), n);
+			if (value != null && value.trim().length() == 0) {
+				value = null;
+			}
 		}
 	}
 			

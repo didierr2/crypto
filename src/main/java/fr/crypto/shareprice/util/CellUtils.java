@@ -11,6 +11,24 @@ import org.apache.poi.ss.usermodel.Workbook;
 
 public class CellUtils {
 
+	public static int getColIndex (String colName) {
+		int colIndex = 0;
+		switch (colName.length()) {
+		case 1:
+			colIndex = colName.toUpperCase().charAt(0) - 'A';
+			break;
+		case 2:
+			colIndex = (colName.toUpperCase().charAt(0) - 'A' + 1) * 26;
+			colIndex += colName.toUpperCase().charAt(1) - 'A';
+			break;
+		default : 
+			throw new RuntimeException("Impossible de charger une cellule excel avec un nom sur 3 caracteres : " + colName);
+		}
+		//System.out.println(colName + " = " + colIndex);
+		return colIndex;
+	}
+
+	
 	public static Date getCellAsDateValue(Sheet sheet, int rowIndex, int colIndex) {
 		Date val = null;
 		try {
@@ -24,6 +42,10 @@ public class CellUtils {
 		return val;
 	}
 	
+	public static String getCellAsTextValue(Sheet sheet, int rowIndex, String colName) {
+		return getCellAsTextValue(sheet, rowIndex, getColIndex(colName));
+	
+	}
 	public static String getCellAsTextValue(Sheet sheet, int rowIndex, int colIndex) {
 		String val = "";
 		try {
@@ -62,6 +84,10 @@ public class CellUtils {
 	}
 	
 
+	public static void writePercentCell (Workbook workbook, Sheet sheet, int rowIndex, String colName, String val) {
+		writePercentCell(workbook, sheet, rowIndex, getColIndex(colName), val);
+	}
+	
 	public static void writePercentCell (Workbook workbook, Sheet sheet, int rowIndex, int colIndex, String val) {
 		if (val != null) {
 			try {
@@ -80,6 +106,9 @@ public class CellUtils {
 		}
 	}
 
+	public static Cell writeNumericCell (Sheet sheet, int rowIndex, String colName, String val) {
+		return writeNumericCell(sheet, rowIndex, getColIndex(colName), val);
+	}
 	public static Cell writeNumericCell (Sheet sheet, int rowIndex, int colIndex, String val) {
 		Cell cell = null;
 		if (val != null) {
@@ -97,6 +126,10 @@ public class CellUtils {
 			cell = writeCell(sheet, rowIndex, colIndex, "");
 		}
 		return cell;
+	}
+	
+	public static Cell writeCell (Sheet sheet, int rowIndex, String colName, String val) {
+		return writeCell(sheet, rowIndex, getColIndex(colName), val);
 	}
 	
 	public static Cell writeCell (Sheet sheet, int rowIndex, int colIndex, String val) {

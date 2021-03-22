@@ -11,6 +11,7 @@ import java.util.List;
 import org.apache.poi.openxml4j.util.ZipSecureFile;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFFormulaEvaluator;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 
@@ -34,11 +35,11 @@ public abstract class AbstractWorkbookHandler {
 	 * Gère la lecture physique du fichier, la fermeture des streams et la sauvegarde du fichier si necesaire
 	 * @param openMode
 	 * @param workbookPath
-	 * @param sheetNumber
+	 * @param sheetNames
 	 * @throws FileNotFoundException
 	 * @throws IOException
 	 */
-	public void readWorkbook(OPEN_MODE openMode, String workbookPath, int... sheetNumbers) throws FileNotFoundException, IOException {
+	public void readWorkbook(OPEN_MODE openMode, String workbookPath, String... sheetNames) throws FileNotFoundException, IOException {
 		ZipSecureFile.setMinInflateRatio(0) ;
 		Workbook workbook = null;
 		System.out.println("Ouverture du fichier : " + workbookPath);
@@ -46,12 +47,16 @@ public abstract class AbstractWorkbookHandler {
 			workbook = new XSSFWorkbook(stream);
 			List<Sheet> lstSheet = new ArrayList<>();
 			String names = "";
-			for (int num : sheetNumbers) {
-				Sheet sheet = workbook.getSheetAt(num);
+			for (String name : sheetNames) {
+				int idx = workbook.getSheetIndex(name);
+				if (idx < 0) {
+					throw new RuntimeException("La feuille " + name + " n'existe pas dans le classeur excel.");
+				}
+				Sheet sheet = workbook.getSheetAt(idx);
 				lstSheet.add(sheet);
 				names += sheet.getSheetName() + " ";
 			}
-			System.out.println("Recuperation des feuilles : " + names);
+			System.out.println("Recuperation dee la feuille : " + names);
 			processSheet(workbook, lstSheet.toArray(new Sheet[lstSheet.size()]));
 			
 		}
@@ -96,8 +101,11 @@ public abstract class AbstractWorkbookHandler {
 	 */
 	private void saveAndCloseWorkbook(Workbook workbook, String filename, OPEN_MODE openMode) {
 		if (workbook != null) {
+			
 			try (FileOutputStream outputStream = new FileOutputStream(filename)) {
 				if (openMode == OPEN_MODE.READ_WRITE) {
+					// Update formula before saving
+					XSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
 					workbook.write(outputStream);
 					System.out.println("Fichier sauvegarde : " + filename);
 				}

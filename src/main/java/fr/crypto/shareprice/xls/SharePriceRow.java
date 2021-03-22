@@ -114,20 +114,27 @@ public class SharePriceRow {
 		
 		// Enregistre les infos récupérées
 		writeNumericCell(sheet, rowIndex, Constants.COLS.PRICE_ACTUAL.value, sp.getPriceActual());
-		writeNumericCell(sheet, rowIndex, Constants.COLS.POSITION.value, sp.getPosition());
-		writePercentCell(sheet.getWorkbook(), sheet, rowIndex, Constants.COLS.VAR_1D.value, String.valueOf(Double.valueOf(sp.getVar1D()) / 100));
+		if (Constants.COLS.POSITION.value != null) {
+			writeNumericCell(sheet, rowIndex, Constants.COLS.POSITION.value, sp.getPosition());
+		}
+		if (Constants.COLS.VAR_1D.value != null) {
+			writePercentCell(sheet.getWorkbook(), sheet, rowIndex, Constants.COLS.VAR_1D.value, String.valueOf(Double.valueOf(sp.getVar1D()) / 100));
+		}
 		//writePercentCell(sheet.getWorkbook(), sheet, rowIndex, Constants.COLS.VAR_1W.value, sp.getVar1W());
 
 		// Enregistre les calculs de rendement / variation
-		writeCell(sheet, rowIndex, Constants.COLS.UPDATE_DATE.value, Constants.SDF_EXCEL.format(new Date()));
-		if (isBuyInfoPresent()) {
-			writePercentCell(sheet.getWorkbook(), sheet, rowIndex, Constants.COLS.PL_PERCENT.value, String.valueOf(determinePercentPL()));
-			writeNumericCell(sheet, rowIndex, Constants.COLS.PL_VALUE.value, String.valueOf(determineValuePL()));
+		if (Constants.COLS.UPDATE_DATE.value != null) {
+			writeCell(sheet, rowIndex, Constants.COLS.UPDATE_DATE.value, Constants.SDF_EXCEL.format(new Date()));
 		}
+//		if (isBuyInfoPresent()) {
+//			writePercentCell(sheet.getWorkbook(), sheet, rowIndex, Constants.COLS.PL_PERCENT.value, String.valueOf(determinePercentPL()));
+//			writeNumericCell(sheet, rowIndex, Constants.COLS.PL_VALUE.value, String.valueOf(determineValuePL()));
+//		}
 	}
 	
-	private String getCellAsTextValue(int colIndex) {
-		return CellUtils.getCellAsTextValue(sheet, rowIndex, colIndex);
+	private String getCellAsTextValue(String colName) {
+		return colName == null ? null : CellUtils.getCellAsTextValue(sheet, rowIndex, colName);
 	}
+	
 
 }

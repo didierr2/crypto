@@ -42,34 +42,39 @@ public class SharePriceImporterStarter extends AbstractWorkbookHandler {
 
 	@Override
 	protected void processSheet(Workbook workbook, Sheet data) {
-
 		
 		// On parcourt toutes les cryptos (tous les rows)
 		SharePriceRow sp = SharePriceRow.first(data);
-		while(sp.isPresent()) {
+		final int MAX_EMPTY = 5;
+		int retry = MAX_EMPTY;
+		while(retry > 0) {
+			if (sp.isPresent()) {
+				retry = MAX_EMPTY;
 			
-			if (sp.isUpdatable()) {
-				// On effectue l'appel distant
-				SharePriceBean actualSp = loadSharePrice(sp.getUpdateUrl());
-				
-				if (actualSp != null) {
-					// On enregistre les infos
-					sp.update(actualSp);
-					System.out.println("\n" + sp.getIndex() + " : mise a jour reussie, prix actuel = " + sp.getPriceActual() + " euros");
-					sleep();
-				} 
+				if (sp.isUpdatable()) {
+					// On effectue l'appel distant
+					SharePriceBean actualSp = loadSharePrice(sp.getUpdateUrl());
+					
+					if (actualSp != null) {
+						// On enregistre les infos
+						sp.update(actualSp);
+						System.out.println(sp.getIndex());
+						sleep();
+					} 
+					else {
+						// TODO On fait quoi, on reinit les cellules ?
+						System.out.println("Impossible de charger la valeur " + sp.getIndex());
+					}
+				}
 				else {
-					// TODO On fait quoi, on reinit les cellules ?
-					System.out.println("Impossible de charger la valeur " + sp.getIndex());
+					System.out.println("\n" + sp.getIndex() + " : mise a jour impossible car l'url de mise a jour n'est pas renseignee");
 				}
 			}
 			else {
-				System.out.println("\n" + sp.getIndex() + " : mise a jour impossible car l'url de mise a jour n'est pas renseignee");
+				retry--;
 			}
 			
 			sp.nextRow();
-			
-			
 		}
 	}
 
