@@ -6,14 +6,12 @@ import java.io.IOException;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
 
-import fr.crypto.shareprice.importer.CoinMarketCapImporter;
 import fr.crypto.shareprice.importer.SharePriceBean;
 import fr.crypto.shareprice.importer.SharePriceImportable;
+import fr.crypto.shareprice.util.PropertyManager;
 import fr.crypto.shareprice.xls.AbstractWorkbookHandler;
 import fr.crypto.shareprice.xls.SharePriceRow;
 
-// TODO Externaliser les configs dans un fichier properties
-// TODO Gérer les exceptions par ligne
 
 
 public class SharePriceImporterStarter extends AbstractWorkbookHandler {
@@ -27,7 +25,12 @@ public class SharePriceImporterStarter extends AbstractWorkbookHandler {
 			System.err.println("Parametre d'execution manquant.");
 			System.exit(-1);
 		}
-		
+
+		// Gere le fichier de conf passé en paramètre
+		if (args.length > 1) {
+			PropertyManager.loadProperties(args[1]);
+		}
+
 		// On réalise l'import des cours
 		new SharePriceImporterStarter().importStocks(args[0]);
 	}
@@ -48,9 +51,17 @@ public class SharePriceImporterStarter extends AbstractWorkbookHandler {
 			if (sp.isUpdatable()) {
 				// On effectue l'appel distant
 				SharePriceBean actualSp = loadSharePrice(sp.getUpdateUrl());
-				// On enregistre les infos
-				sp.update(actualSp);
-				System.out.println("\n" + sp.getIndex() + " : mise a jour reussie, prix actuel = " + sp.getPriceActual() + " euros");
+				
+				if (actualSp != null) {
+					// On enregistre les infos
+					sp.update(actualSp);
+					System.out.println("\n" + sp.getIndex() + " : mise a jour reussie, prix actuel = " + sp.getPriceActual() + " euros");
+					sleep();
+				} 
+				else {
+					// TODO On fait quoi, on reinit les cellules ?
+					System.out.println("Impossible de charger la valeur " + sp.getIndex());
+				}
 			}
 			else {
 				System.out.println("\n" + sp.getIndex() + " : mise a jour impossible car l'url de mise a jour n'est pas renseignee");
@@ -58,55 +69,42 @@ public class SharePriceImporterStarter extends AbstractWorkbookHandler {
 			
 			sp.nextRow();
 			
-//			sleep();
+			
 		}
 	}
 
 	
-	SharePriceImportable importer = new CoinMarketCapImporter();
+	private SharePriceImportable findImporter(String url) {
+		SharePriceImportable imp = null;
+		
+		for (SharePriceImportable tmp: Constants.SHARE_PRICE_IMPORTERS) {
+			imp = tmp.isElligible(url) ? tmp : imp;
+		}
+		
+		return imp;
+	}
+	
 	private SharePriceBean loadSharePrice(String url) {
-		SharePriceBean sp = new SharePriceBean();
+		SharePriceBean sp = null;
 		
 		try {
-			if (importer.isElligible(url)) {
-				sp = importer.importSharePrice(url);
+			SharePriceImportable imp = findImporter(url);
+			if (imp != null) {
+				sp = imp.importSharePrice(url);
 			}
 		}
 		catch (Exception e) {
 			e.printStackTrace();
 		}
-		
-		/*LogRecorder recorder = new LogRecorder(); 
-		try {
-				// Call distant
-				recorder.addLog("connexion a l'url... " + url);
-				Document doc = Jsoup.connect(url).get();
-				// Web scraping
-				recorder.addLog("recuperation html ok, parse le dom...");
-				Element main = doc.getElementById("main-content");
-				Element header = main.getElementsByTag("header").first();
-				String cours = header.getElementsByClass("c-instrument--last").first().text();
-				if (cours != null) {
-					cours = cours.replace(" ", "");
-				}
-				stock.setCours(cours);
-				stock.setIsin(header.getElementsByClass("c-faceplate__isin").first().text());
-				stock.setSociete(header.getElementsByClass("c-faceplate__company-link").first().text());
-				recorder.addLog("parsing html ok : " + stock);				
-			}
-		catch (Exception e) {
-			recorder.getLogs().forEach(mess -> System.err.println(mess));
-			e.printStackTrace();
-		}	*/
 		return sp;
 	}
 	
 	
 	private void sleep() {
 
-		// L'attente est aléatoirement calculée entre 1x et 2x SLEEP_INTERVAL_SECONDS
+		// L'attente est aléatoirement calculée entre 1x et 2x SLEEP_INTERVAL_MILLISECONDS
 		try {
-			Thread.sleep(((int)(Math.random() * Constants.SLEEP_INTERVAL_SECONDS) + Constants.SLEEP_INTERVAL_SECONDS) * 1000);
+			Thread.sleep((int)(Math.random() * Constants.SLEEP_INTERVAL_MILLISECONDS) + Constants.SLEEP_INTERVAL_MILLISECONDS);
 		} catch (InterruptedException e) {
 			e.printStackTrace();
 		}

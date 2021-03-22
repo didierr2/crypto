@@ -74,27 +74,56 @@ public class SharePriceRow {
 		return ind != null && !ind.isEmpty();
 	}
 
+	public boolean isBuyInfoPresent() {
+		String quantity = getQuantity();
+		String price = getPriceBuy();
+		return quantity != null && !quantity.isEmpty() && price != null && !price.isEmpty();
+	}
+
+	
 	public boolean isUpdatable() {
 		String url = getUpdateUrl();
 		return url != null && !url.isEmpty();
 	}
+	
+	public double determinePercentPL() {
+		double buy = toDouble(getPriceBuy(), 1d);
+		double actual = toDouble(getPriceActual(), 1d);
+		return (1d / buy * actual) -1; 
+	}
 
+	public double determineValuePL() {
+		double quantity = toDouble(getQuantity(), 0d);
+		double buy = toDouble(getPriceBuy(), 1d);
+		double actual = toDouble(getPriceActual(), 1d);
+		return (quantity * actual) - (quantity * buy); 
+	}
+
+	private double toDouble(String val, Double defaultVal) {
+		Double res = defaultVal;
+		try {
+			res = Double.valueOf(val);
+		} catch (Exception exc) {
+			System.err.print(exc.getMessage());
+			res = defaultVal;
+		}
+		return res;
+	}
 	
 	public void update (SharePriceBean sp) {
 		
 		// Enregistre les infos récupérées
 		writeNumericCell(sheet, rowIndex, Constants.COLS.PRICE_ACTUAL.value, sp.getPriceActual());
 		writeNumericCell(sheet, rowIndex, Constants.COLS.POSITION.value, sp.getPosition());
-//		writeNumericCell(sheet, rowIndex, Constants.COLS.VAR_1D.value, sp.getVar1D());
 		writePercentCell(sheet.getWorkbook(), sheet, rowIndex, Constants.COLS.VAR_1D.value, String.valueOf(Double.valueOf(sp.getVar1D()) / 100));
 		//writePercentCell(sheet.getWorkbook(), sheet, rowIndex, Constants.COLS.VAR_1W.value, sp.getVar1W());
 
 		// Enregistre les calculs de rendement / variation
 		writeCell(sheet, rowIndex, Constants.COLS.UPDATE_DATE.value, Constants.SDF_EXCEL.format(new Date()));
-		// TODO les calculs de rendement variation
-		
-		//writeCell(sheet, Constants.COLS.ROW_SOCIETY.value, rowIndex, stock.getSociete());
-		//writeNumericCell(sheet, rowIndex, Constants.COLS.PRICE_ACTUAL.value, crypto.getCours());
+		if (isBuyInfoPresent()) {
+			writePercentCell(sheet.getWorkbook(), sheet, rowIndex, Constants.COLS.PL_PERCENT.value, String.valueOf(determinePercentPL()));
+			writeNumericCell(sheet, rowIndex, Constants.COLS.PL_VALUE.value, String.valueOf(determineValuePL()));
+		}
 	}
 	
 	private String getCellAsTextValue(int colIndex) {

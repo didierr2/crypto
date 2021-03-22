@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>fr.crypto</groupId>
 	<artifactId>SharePrices</artifactId>
-	<version>0.0.1-SNAPSHOT</version>
+	<version>0.0.1</version>
 	<name>banque</name>
 	<description>Projet de récupération des cours des cryptos</description>
 
@@ -72,14 +72,43 @@
 			<groupId>org.apache.logging.log4j</groupId>
 			<artifactId>log4j-core</artifactId>
 		</dependency>
-	<dependency>
-	    <groupId>junit</groupId>
-	    <artifactId>junit</artifactId>
-	    <version>4.13</version>
-	    <scope>test</scope>
-	</dependency>
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<version>4.13</version>
+			<scope>test</scope>
+		</dependency>
 
 	</dependencies>
+
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-maven-plugin</artifactId>
+				<!-- La version managee semble me poser un probleme -->
+				<version>2.0.1.RELEASE</version>
+				<configuration>
+				<outputDirectory>start/</outputDirectory>
+				<mainClass>fr.crypto.shareprice.SharePriceImporterStarter</mainClass>
+				<layout>ZIP</layout>
+				</configuration>
+			</plugin>
+
+			<!-- <plugin> -->
+			<!-- <groupId>org.apache.maven.plugins</groupId> -->
+			<!-- <artifactId>maven-jar-plugin</artifactId> -->
+			<!-- <configuration> -->
+			<!-- <archive> -->
+			<!-- <manifestEntries> -->
+			<!-- <Multi-Release>true</Multi-Release> -->
+			<!-- </manifestEntries> -->
+			<!-- </archive> -->
+			<!-- </configuration> -->
+			<!-- </plugin> -->
+		</plugins>
+	</build>
 
 	<!-- <build> -->
 	<!-- <plugins> -->
