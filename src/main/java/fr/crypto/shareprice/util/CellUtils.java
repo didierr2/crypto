@@ -63,28 +63,38 @@ public class CellUtils {
 	
 
 	public static void writePercentCell (Workbook workbook, Sheet sheet, int rowIndex, int colIndex, String val) {
-		try {
-			Cell cell = writeNumericCell(sheet, rowIndex, colIndex, val);
-			CellStyle style = workbook.createCellStyle();
-			style.setDataFormat(workbook.createDataFormat().getFormat("0.00%")); //"0.00%"
-			cell.setCellStyle(style);
+		if (val != null) {
+			try {
+				Cell cell = writeNumericCell(sheet, rowIndex, colIndex, val);
+				CellStyle style = workbook.createCellStyle();
+				style.setDataFormat(workbook.createDataFormat().getFormat("0.00%")); //"0.00%"
+				cell.setCellStyle(style);
+			}
+			catch (NumberFormatException nfe) {
+				System.err.println(String.format("Erreur durant l'ecriture de '%s' en tant que nombre dans la cellule (lecriture sera realisee en string): %s", val, nfe.getMessage()));
+				writeCell(sheet, rowIndex, colIndex, val);
+			}
 		}
-		catch (NumberFormatException nfe) {
-			System.err.println(String.format("Erreur durant l'ecriture de '%s' en tant que nombre dans la cellule (lecriture sera realisee en string): %s", val, nfe.getMessage()));
-			writeCell(sheet, rowIndex, colIndex, val);
+		else {
+			writeCell(sheet, rowIndex, colIndex, "");
 		}
 	}
 
 	public static Cell writeNumericCell (Sheet sheet, int rowIndex, int colIndex, String val) {
 		Cell cell = null;
-		try {
-			Double num = Double.valueOf(val);
-			cell = createCellIfNotExists(sheet, rowIndex, colIndex, CellType.NUMERIC);
-			cell.setCellValue(num);
+		if (val != null) {
+			try {
+				Double num = Double.valueOf(val);
+				cell = createCellIfNotExists(sheet, rowIndex, colIndex, CellType.NUMERIC);
+				cell.setCellValue(num);
+			}
+			catch (NumberFormatException nfe) {
+				System.err.println(String.format("Erreur durant l'ecriture de '%s' en tant que nombre dans la cellule (lecriture sera realisee en string): %s", val, nfe.getMessage()));
+				cell = writeCell(sheet, rowIndex, colIndex, val);
+			}
 		}
-		catch (NumberFormatException nfe) {
-			System.err.println(String.format("Erreur durant l'ecriture de '%s' en tant que nombre dans la cellule (lecriture sera realisee en string): %s", val, nfe.getMessage()));
-			cell = writeCell(sheet, rowIndex, colIndex, val);
+		else {
+			cell = writeCell(sheet, rowIndex, colIndex, "");
 		}
 		return cell;
 	}
