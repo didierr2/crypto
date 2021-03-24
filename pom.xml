@@ -11,7 +11,7 @@
 	</parent>
 	<groupId>fr.crypto</groupId>
 	<artifactId>SharePrices</artifactId>
-	<version>0.0.1</version>
+	<version>0.0.2</version>
 	<name>banque</name>
 	<description>Projet de récupération des cours des cryptos</description>
 
