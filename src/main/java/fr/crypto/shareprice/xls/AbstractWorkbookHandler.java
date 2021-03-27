@@ -43,25 +43,30 @@ public abstract class AbstractWorkbookHandler {
 		ZipSecureFile.setMinInflateRatio(0) ;
 		Workbook workbook = null;
 		System.out.println("Ouverture du fichier : " + workbookPath);
-		try (FileInputStream stream = new FileInputStream(new File(workbookPath))) {
-			workbook = new XSSFWorkbook(stream);
-			List<Sheet> lstSheet = new ArrayList<>();
-			String names = "";
-			for (String name : sheetNames) {
-				int idx = workbook.getSheetIndex(name);
-				if (idx < 0) {
-					throw new RuntimeException("La feuille " + name + " n'existe pas dans le classeur excel.");
+		
+		if (checkFileIsNotUsed(workbook, workbookPath)) {
+		
+			try (FileInputStream stream = new FileInputStream(new File(workbookPath))) {
+				workbook = new XSSFWorkbook(stream);
+				List<Sheet> lstSheet = new ArrayList<>();
+				String names = "";
+				for (String name : sheetNames) {
+					int idx = workbook.getSheetIndex(name);
+					if (idx < 0) {
+						throw new RuntimeException("La feuille " + name + " n'existe pas dans le classeur excel.");
+					}
+					Sheet sheet = workbook.getSheetAt(idx);
+					lstSheet.add(sheet);
+					names += sheet.getSheetName() + " ";
 				}
-				Sheet sheet = workbook.getSheetAt(idx);
-				lstSheet.add(sheet);
-				names += sheet.getSheetName() + " ";
+				System.out.println("Recuperation dee la feuille : " + names);
+				processSheet(workbook, lstSheet.toArray(new Sheet[lstSheet.size()]));
+				
 			}
-			System.out.println("Recuperation dee la feuille : " + names);
-			processSheet(workbook, lstSheet.toArray(new Sheet[lstSheet.size()]));
-			
+			// on enregistre le fichier
+			saveWorkbook(workbook, workbookPath, openMode);
+			closeWorkbook(workbook, workbookPath);
 		}
-		// on enregistre le fichier
-		saveAndCloseWorkbook(workbook, workbookPath, openMode);
 	}
 	
 	protected void processSheet(Workbook workbook, Sheet sheet) {
@@ -99,28 +104,44 @@ public abstract class AbstractWorkbookHandler {
 	 * @param filename
 	 * @param openMode
 	 */
-	private void saveAndCloseWorkbook(Workbook workbook, String filename, OPEN_MODE openMode) {
+	private void closeWorkbook(Workbook workbook, String filename) {
 		if (workbook != null) {
 			
-			try (FileOutputStream outputStream = new FileOutputStream(filename)) {
-				if (openMode == OPEN_MODE.READ_WRITE) {
-					// Update formula before saving
-					XSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
-					workbook.write(outputStream);
-					System.out.println("Fichier sauvegarde : " + filename);
-				}
+			try {
 				workbook.close();
 			} catch (IOException e) {
-				if (openMode == OPEN_MODE.READ_WRITE) {
-					System.err.println("Erreur a l'enregistrement du fichier excel");
-				}
-				else {
-					System.err.println("Erreur a la fermeture du fichier excel");
-				}
+				System.err.println("Erreur a la fermeture du fichier excel");
 				e.printStackTrace();
 			}
 		}
 
 	}		
+	
+	private void saveWorkbook(Workbook workbook, String filename, OPEN_MODE openMode) {
+		if (workbook != null) {
+			
+			if (openMode == OPEN_MODE.READ_WRITE) {
+				try (FileOutputStream outputStream = new FileOutputStream(filename)) {
+					// Update formula before saving
+					XSSFFormulaEvaluator.evaluateAllFormulaCells(workbook);
+					workbook.write(outputStream);
+					System.out.println("Fichier sauvegarde : " + filename);
+				} catch (IOException e) {
+					System.err.println("Erreur a l'enregistrement du fichier excel");
+					e.printStackTrace();
+				}
+			}
+		}
+	}	
+	
+	private boolean checkFileIsNotUsed(Workbook workbook, String filename) {
+		boolean isNotUsed = true;
+		try (FileOutputStream outputStream = new FileOutputStream(filename)) {
+		} catch (IOException e) {
+			System.err.println("Le fichier excel " + filename + " semble déjà utilise, merci de le libérer et de relancer le programme.");
+			isNotUsed = false;
+		}
+		return isNotUsed;
+	}	
 	
 }
