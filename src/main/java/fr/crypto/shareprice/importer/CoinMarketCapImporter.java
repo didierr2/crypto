@@ -30,8 +30,8 @@ public class CoinMarketCapImporter implements SharePriceImportable {
 		sp.setPriceActual(cours);
 		
 		Elements elems = doc.getElementsByClass("sc-1v2ivon-0 gClTFY");
-		boolean positive = elems.first().child(0).text().contains("icon-Caret-up");
-		sp.setVar1D(positive ? "" : "-" + elems.first().text().replace("%", ""));
+		boolean positive = elems.first().child(0).attr("class").contains("icon-Caret-up");
+		sp.setVar1D((positive ? "" : "-") + elems.first().text().replace("%", ""));
 		
 		String pos = doc.getElementsByClass("namePill___3p_Ii namePillPrimary___2-GWA").text();
 		if (pos.toLowerCase().contains("position")) {
