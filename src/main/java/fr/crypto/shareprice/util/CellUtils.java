@@ -49,24 +49,27 @@ public class CellUtils {
 	public static String getCellAsTextValue(Sheet sheet, int rowIndex, int colIndex) {
 		String val = "";
 		try {
-			Cell cell = sheet.getRow(rowIndex).getCell(colIndex);
-			if (cell != null) {
-				switch (cell.getCellType()) {
-				case BOOLEAN:
-					val = String.valueOf(cell.getBooleanCellValue());
-					break;
-				case STRING:
-					val = cell.getStringCellValue();
-					break;
-				case BLANK:
-					val = "";
-					break;
-				case NUMERIC:
-					val = String.valueOf(cell.getNumericCellValue());
-					break;
-				default:
-					System.err.println("Read error " + getCellLabel(rowIndex, colIndex) + ", type = " + cell.getCellType().name());
-					break;
+			Row row = sheet.getRow(rowIndex);
+			if (row != null) {
+				Cell cell = row.getCell(colIndex);
+				if (cell != null) {
+					switch (cell.getCellType()) {
+					case BOOLEAN:
+						val = String.valueOf(cell.getBooleanCellValue());
+						break;
+					case STRING:
+						val = cell.getStringCellValue();
+						break;
+					case BLANK:
+						val = "";
+						break;
+					case NUMERIC:
+						val = String.valueOf(cell.getNumericCellValue());
+						break;
+					default:
+						System.err.println("Read error " + getCellLabel(rowIndex, colIndex) + ", type = " + cell.getCellType().name());
+						break;
+					}
 				}
 			}
 		} catch (Exception e) {
