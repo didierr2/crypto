@@ -44,6 +44,7 @@ public abstract class AbstractWorkbookHandler {
 		Workbook workbook = null;
 		System.out.println("Ouverture du fichier : " + workbookPath);
 		
+		// Si le fichier est deja ouvert, on ne lance pas le traitement car on ne pourra pas enregistrer les resultats
 		if (checkFileIsNotUsed(workbook, workbookPath)) {
 		
 			try (FileInputStream stream = new FileInputStream(new File(workbookPath))) {
@@ -136,7 +137,7 @@ public abstract class AbstractWorkbookHandler {
 	
 	private boolean checkFileIsNotUsed(Workbook workbook, String filename) {
 		boolean isNotUsed = true;
-		try (FileOutputStream outputStream = new FileOutputStream(filename)) {
+		try (FileOutputStream outputStream = new FileOutputStream(filename, true)) {
 		} catch (IOException e) {
 			System.err.println("Le fichier excel " + filename + " semble déjà utilise, merci de le libérer et de relancer le programme.");
 			isNotUsed = false;
