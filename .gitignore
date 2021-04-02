@@ -18,3 +18,7 @@
 .settings
 
 /start/jre-11.0.8-2/
+
+# Ressources personnelles
+src\main\resources\crypto-*
+src\main\resources\save

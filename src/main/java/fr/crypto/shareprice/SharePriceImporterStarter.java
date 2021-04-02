@@ -2,6 +2,7 @@ package fr.crypto.shareprice;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
+import java.util.HashMap;
 
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -16,8 +17,12 @@ import fr.crypto.shareprice.xls.SharePriceRow;
 
 public class SharePriceImporterStarter extends AbstractWorkbookHandler {
 
-
+// TODO : réupérer le code de la crypto et le vérifier avec le fichier excel etre sur qu'on a le bon lien de maj
+// revoir le mécanisme de tests que le fichiers excel est libre	
 	
+	// Map des cryptos deja récupérées afin de ne pas faire plusieurs fois le meme appel
+	private HashMap<String, SharePriceBean> alreadyLoaded = new HashMap<>();
+
 	public static void main(String[] args) throws FileNotFoundException, IOException, InterruptedException {
 		
 		// Check args
@@ -59,7 +64,6 @@ public class SharePriceImporterStarter extends AbstractWorkbookHandler {
 						// On enregistre les infos
 						sp.update(actualSp);
 						System.out.println(sp.getIndex());
-						sleep();
 					} 
 					else {
 						// TODO On fait quoi, on reinit les cellules ?
@@ -67,7 +71,7 @@ public class SharePriceImporterStarter extends AbstractWorkbookHandler {
 					}
 				}
 				else {
-					System.out.println("\n" + sp.getIndex() + " : mise a jour impossible car l'url de mise a jour n'est pas renseignee");
+					System.out.println(sp.getIndex() + " : l'url de mise a jour n'est pas renseignee");
 				}
 			}
 			else {
@@ -78,7 +82,12 @@ public class SharePriceImporterStarter extends AbstractWorkbookHandler {
 		}
 	}
 
-	
+	/**
+	 * Trouve le bon connecteur de récupération du cours 
+	 * (le connecteur dépend du site sur lequel on récupère le cours) 
+	 * @param url : url de récupération du cours
+	 * @return SharePriceImportable : le connecteur
+	 */
 	private SharePriceImportable findImporter(String url) {
 		SharePriceImportable imp = null;
 		
@@ -89,22 +98,38 @@ public class SharePriceImporterStarter extends AbstractWorkbookHandler {
 		return imp;
 	}
 	
+	/**
+	 * Charge le cours de la crypto
+	 * @param url : url de récupération du cours
+	 * @return SharePriceBean : le databean du cours
+	 */
 	private SharePriceBean loadSharePrice(String url) {
 		SharePriceBean sp = null;
 		
-		try {
-			SharePriceImportable imp = findImporter(url);
-			if (imp != null) {
-				sp = imp.importSharePrice(url);
+		// Si la crypto a déjà été importée, on la récupère sans appel distant, sinon appel http
+		if (alreadyLoaded.containsKey(url)) {
+			sp = alreadyLoaded.get(url);
+		} 
+		else {
+			try {
+				SharePriceImportable imp = findImporter(url);
+				if (imp != null) {
+					sp = imp.importSharePrice(url);
+					alreadyLoaded.put(url, sp);
+					sleep();
+				}
 			}
-		}
-		catch (Exception e) {
-			e.printStackTrace();
+			catch (Exception e) {
+				e.printStackTrace();
+			}
 		}
 		return sp;
 	}
 	
-	
+	/**
+	 * Patiente...
+	 * Permet de ne pas enchainer trop vite les appels sur le même site afin de ne pas se faire blacklister
+	 */
 	private void sleep() {
 
 		// L'attente est aléatoirement calculée entre 1x et 2x SLEEP_INTERVAL_MILLISECONDS

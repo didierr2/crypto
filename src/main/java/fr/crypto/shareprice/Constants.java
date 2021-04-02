@@ -29,7 +29,7 @@ public final class Constants {
 	}); 
 	
 	
-	public static final String URL_CRYPTOAST = "/cryptoast.fr/";
+	public static final String URL_CRYPTOAST = "/cryptoast.fr/"; // Importer pas encore fonctionnel
 	public static final String URL_COINMARKETCAP = "/coinmarketcap.com/";
 	public static final String URL_COURSCRYPTOMONNAIES = "/courscryptomonnaies.com/";
 	
