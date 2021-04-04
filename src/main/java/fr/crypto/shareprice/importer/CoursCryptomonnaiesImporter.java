@@ -4,9 +4,11 @@ import java.io.IOException;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
+import org.springframework.stereotype.Service;
 
 import fr.crypto.shareprice.Constants;
 
+@Service
 public class CoursCryptomonnaiesImporter implements SharePriceImportable {
 
 	@Override
@@ -15,7 +17,7 @@ public class CoursCryptomonnaiesImporter implements SharePriceImportable {
 	}
 
 	@Override
-	public SharePriceBean importSharePrice(String url) throws IOException {
+	public SharePriceBean importSharePrice(String url, String symbol) throws IOException {
 		SharePriceBean sp = new SharePriceBean();
 		
 		// Call distant

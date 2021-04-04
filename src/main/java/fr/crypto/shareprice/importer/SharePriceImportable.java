@@ -6,6 +6,6 @@ public interface SharePriceImportable {
 
 	boolean isElligible(String url);
 	
-	SharePriceBean importSharePrice (String url) throws IOException ;
+	SharePriceBean importSharePrice (String url, String symbol) throws IOException ;
 	
 }

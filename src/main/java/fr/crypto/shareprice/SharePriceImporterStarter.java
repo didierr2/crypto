@@ -3,9 +3,13 @@ package fr.crypto.shareprice;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.HashMap;
+import java.util.List;
 
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.context.ConfigurableApplicationContext;
 
 import fr.crypto.shareprice.importer.SharePriceBean;
 import fr.crypto.shareprice.importer.SharePriceImportable;
@@ -14,16 +18,26 @@ import fr.crypto.shareprice.xls.AbstractWorkbookHandler;
 import fr.crypto.shareprice.xls.SharePriceRow;
 
 
-
+@SpringBootApplication
 public class SharePriceImporterStarter extends AbstractWorkbookHandler {
 
 // TODO : réupérer le code de la crypto et le vérifier avec le fichier excel etre sur qu'on a le bon lien de maj
 // revoir le mécanisme de tests que le fichiers excel est libre	
-	
+
 	// Map des cryptos deja récupérées afin de ne pas faire plusieurs fois le meme appel
 	private HashMap<String, SharePriceBean> alreadyLoaded = new HashMap<>();
 
+	/** Liste des importers de cours */
+	static List<SharePriceImportable> SHARE_PRICE_IMPORTERS = null; 
+
 	public static void main(String[] args) throws FileNotFoundException, IOException, InterruptedException {
+		ConfigurableApplicationContext ctx = SpringApplication.run(SharePriceImporterStarter.class, args);
+		start(args);
+		ctx.close();
+	}
+
+
+	public static void start(String[] args) throws FileNotFoundException, IOException, InterruptedException {
 		
 		// Check args
 		if (args.length == 0 || args[0] == null) {
@@ -58,12 +72,14 @@ public class SharePriceImporterStarter extends AbstractWorkbookHandler {
 			
 				if (sp.isUpdatable()) {
 					// On effectue l'appel distant
-					SharePriceBean actualSp = loadSharePrice(sp.getUpdateUrl());
+					System.out.print(sp.getIndex() + "   ");
+					SharePriceBean actualSp = loadSharePrice(sp.getUpdateUrl(), sp.getIndex());
 					
 					if (actualSp != null) {
 						// On enregistre les infos
+						System.out.print("save ");
 						sp.update(actualSp);
-						System.out.println(sp.getIndex());
+						System.out.println("");
 					} 
 					else {
 						// TODO On fait quoi, on reinit les cellules ?
@@ -91,7 +107,7 @@ public class SharePriceImporterStarter extends AbstractWorkbookHandler {
 	private SharePriceImportable findImporter(String url) {
 		SharePriceImportable imp = null;
 		
-		for (SharePriceImportable tmp: Constants.SHARE_PRICE_IMPORTERS) {
+		for (SharePriceImportable tmp: SharePriceImporterStarter.SHARE_PRICE_IMPORTERS) {
 			imp = tmp.isElligible(url) ? tmp : imp;
 		}
 		
@@ -103,7 +119,7 @@ public class SharePriceImporterStarter extends AbstractWorkbookHandler {
 	 * @param url : url de récupération du cours
 	 * @return SharePriceBean : le databean du cours
 	 */
-	private SharePriceBean loadSharePrice(String url) {
+	private SharePriceBean loadSharePrice(String url, String symbol) {
 		SharePriceBean sp = null;
 		
 		// Si la crypto a déjà été importée, on la récupère sans appel distant, sinon appel http
@@ -114,7 +130,7 @@ public class SharePriceImporterStarter extends AbstractWorkbookHandler {
 			try {
 				SharePriceImportable imp = findImporter(url);
 				if (imp != null) {
-					sp = imp.importSharePrice(url);
+					sp = imp.importSharePrice(url, symbol);
 					alreadyLoaded.put(url, sp);
 					sleep();
 				}

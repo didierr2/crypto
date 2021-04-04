@@ -45,26 +45,10 @@ public class SharePriceRow {
 		return getCellAsTextValue(Constants.COLS.PRICE_ACTUAL.value);
 	}
 
-	public String getPlPercent() {
-		return getCellAsTextValue(Constants.COLS.PL_PERCENT.value);
-	}
-
-	public String getPlValue() {
-		return getCellAsTextValue(Constants.COLS.PL_VALUE.value);
-	}
-
 	public String getPosition() {
 		return getCellAsTextValue(Constants.COLS.POSITION.value);
 	}
 
-	public String getVar1D() {
-		return getCellAsTextValue(Constants.COLS.VAR_1D.value);
-	}
-
-	public String getVar1W() {
-		return getCellAsTextValue(Constants.COLS.VAR_1W.value);
-	}
-	
 	public String getUpdateUrl() {
 		return getCellAsTextValue(Constants.COLS.UPDATE_URL.value);
 	}
@@ -117,19 +101,40 @@ public class SharePriceRow {
 		if (Constants.COLS.POSITION.value != null) {
 			writeNumericCell(sheet, rowIndex, Constants.COLS.POSITION.value, sp.getPosition());
 		}
+		
+		// Enregistre les variations
 		if (Constants.COLS.VAR_1D.value != null) {
-			writePercentCell(sheet.getWorkbook(), sheet, rowIndex, Constants.COLS.VAR_1D.value, String.valueOf(Double.valueOf(sp.getVar1D()) / 100));
+			writePercentCell(sheet.getWorkbook(), sheet, rowIndex, Constants.COLS.VAR_1D.value, sp.getVar1D() == null ? null : String.valueOf(Double.valueOf(sp.getVar1D()) / 100));
 		}
-		//writePercentCell(sheet.getWorkbook(), sheet, rowIndex, Constants.COLS.VAR_1W.value, sp.getVar1W());
+		if (Constants.COLS.VAR_7D.value != null) {
+			writePercentCell(sheet.getWorkbook(), sheet, rowIndex, Constants.COLS.VAR_7D.value, sp.getVar7D() == null ? null : String.valueOf(Double.valueOf(sp.getVar7D()) / 100));
+		}
+		if (Constants.COLS.VAR_14D.value != null) {
+			writePercentCell(sheet.getWorkbook(), sheet, rowIndex, Constants.COLS.VAR_14D.value, sp.getVar14D() == null ? null : String.valueOf(Double.valueOf(sp.getVar14D()) / 100));
+		}
+		if (Constants.COLS.VAR_30D.value != null) {
+			writePercentCell(sheet.getWorkbook(), sheet, rowIndex, Constants.COLS.VAR_30D.value, sp.getVar30D() == null ? null : String.valueOf(Double.valueOf(sp.getVar30D()) / 100));
+		}
+		if (Constants.COLS.VAR_60D.value != null) {
+			writePercentCell(sheet.getWorkbook(), sheet, rowIndex, Constants.COLS.VAR_60D.value, sp.getVar60D() == null ? null : String.valueOf(Double.valueOf(sp.getVar60D()) / 100));
+		}
+		if (Constants.COLS.VAR_90D.value != null) {
+			writePercentCell(sheet.getWorkbook(), sheet, rowIndex, Constants.COLS.VAR_90D.value, sp.getVar90D() == null ? null : String.valueOf(Double.valueOf(sp.getVar90D()) / 100));
+		}
+		if (Constants.COLS.VAR_180D.value != null) {
+			writePercentCell(sheet.getWorkbook(), sheet, rowIndex, Constants.COLS.VAR_180D.value, sp.getVar180D() == null ? null : String.valueOf(Double.valueOf(sp.getVar180D()) / 100));
+		}
+		if (Constants.COLS.VAR_360D.value != null) {
+			writePercentCell(sheet.getWorkbook(), sheet, rowIndex, Constants.COLS.VAR_360D.value, sp.getVar360D() == null ? null : String.valueOf(Double.valueOf(sp.getVar360D()) / 100));
+		}
+		if (Constants.COLS.VAR_FIRST_DAY_OF_YEAR.value != null) {
+			writePercentCell(sheet.getWorkbook(), sheet, rowIndex, Constants.COLS.VAR_FIRST_DAY_OF_YEAR.value, sp.getVarFirstDayOfYear() == null ? null : String.valueOf(Double.valueOf(sp.getVarFirstDayOfYear()) / 100));
+		}
 
-		// Enregistre les calculs de rendement / variation
+		// Enregistre la date de mise a jour
 		if (Constants.COLS.UPDATE_DATE.value != null) {
 			writeCell(sheet, rowIndex, Constants.COLS.UPDATE_DATE.value, Constants.SDF_EXCEL.format(new Date()));
 		}
-//		if (isBuyInfoPresent()) {
-//			writePercentCell(sheet.getWorkbook(), sheet, rowIndex, Constants.COLS.PL_PERCENT.value, String.valueOf(determinePercentPL()));
-//			writeNumericCell(sheet, rowIndex, Constants.COLS.PL_VALUE.value, String.valueOf(determineValuePL()));
-//		}
 	}
 	
 	private String getCellAsTextValue(String colName) {
