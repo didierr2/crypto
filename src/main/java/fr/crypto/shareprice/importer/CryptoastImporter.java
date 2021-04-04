@@ -5,11 +5,9 @@ import java.io.IOException;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.select.Elements;
-import org.springframework.stereotype.Service;
 
 import fr.crypto.shareprice.Constants;
 
-@Service
 public class CryptoastImporter implements SharePriceImportable {
 
 	@Override

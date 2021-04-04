@@ -1,7 +1,12 @@
 package fr.crypto.shareprice;
 
 import java.text.SimpleDateFormat;
+import java.util.Arrays;
+import java.util.List;
 
+import fr.crypto.shareprice.importer.CoinMarketCapImporter;
+import fr.crypto.shareprice.importer.CoursCryptomonnaiesImporter;
+import fr.crypto.shareprice.importer.SharePriceImportable;
 import fr.crypto.shareprice.util.PropertyManager;
 import lombok.AccessLevel;
 import lombok.NoArgsConstructor;
@@ -17,6 +22,13 @@ public final class Constants {
 	public static final int SLEEP_INTERVAL_MILLISECONDS = PropertyManager.getIntPropertyOrElse("SLEEP_INTERVAL_MILLISECONDS", 1000);
 	
 
+	/** Liste des importers de cours */
+	public static final List<SharePriceImportable> SHARE_PRICE_IMPORTERS = Arrays.asList(new SharePriceImportable[] {
+			new CoursCryptomonnaiesImporter(),
+			new CoinMarketCapImporter()
+	}); 
+	
+	
 	public static final String URL_CRYPTOAST = "/cryptoast.fr/"; // Importer pas encore fonctionnel
 	public static final String URL_COINMARKETCAP = "/coinmarketcap.com/";
 	public static final String URL_COURSCRYPTOMONNAIES = "/courscryptomonnaies.com/";

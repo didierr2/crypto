@@ -7,14 +7,12 @@ import java.util.GregorianCalendar;
 
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
-import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestOperations;
 import org.springframework.web.client.RestTemplate;
 
 import fr.crypto.shareprice.Constants;
 
-@Service
 public class CoinMarketCapImporter implements SharePriceImportable {
 
 	RestOperations http = new RestTemplate();
@@ -178,15 +176,15 @@ public class CoinMarketCapImporter implements SharePriceImportable {
 //		return id;
 //	}
 	
-	private String getPercentChange(String jsonData, String percentChangeName) {
-		String searchString = "\"" + percentChangeName + "\":";
-		String pc = null;
-		if (jsonData.contains(searchString)) {
-			pc = jsonData.substring(jsonData.indexOf(searchString));
-			pc = pc.substring(searchString.length(), pc.indexOf(","));
-		}
-		return pc;
-	}
+//	private String getPercentChange(String jsonData, String percentChangeName) {
+//		String searchString = "\"" + percentChangeName + "\":";
+//		String pc = null;
+//		if (jsonData.contains(searchString)) {
+//			pc = jsonData.substring(jsonData.indexOf(searchString));
+//			pc = pc.substring(searchString.length(), pc.indexOf(","));
+//		}
+//		return pc;
+//	}
 	
 	
 	
