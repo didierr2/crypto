@@ -93,7 +93,7 @@ public class CoinMarketCapImporter implements SharePriceImportable {
 	}
 	
 	private Double getPercentVar(double from, double to) {
-		return from != 0 ? (to / from) : 0;
+		return from != 0 ? (100d * to / from) - 100 : 0;
 	}
 
 	private double getSharePricePreviousDay(String id, int nbDays) {
@@ -106,6 +106,7 @@ public class CoinMarketCapImporter implements SharePriceImportable {
 				String val = data.substring(data.indexOf("\"EUR\":[") + 7);
 				val = val.substring(0, val.indexOf(","));
 				price = Double.valueOf(val);
+//				System.out.println("\nhttps://web-api.coinmarketcap.com/v1.1/cryptocurrency/quotes/historical?convert=EUR&format=chart_crypto_details&id=" + id + "&interval=1d&time_end=" + endTime + "&time_start=" + startTime + " = " + price);
 			}
 		}
 		catch (RestClientException rce) {
