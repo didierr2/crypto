@@ -6,14 +6,17 @@ import java.util.HashMap;
 
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
+import org.slf4j.LoggerFactory;
 
+import ch.qos.logback.classic.Level;
+import ch.qos.logback.classic.Logger;
+import ch.qos.logback.classic.LoggerContext;
 import fr.crypto.shareprice.importer.SharePriceBean;
 import fr.crypto.shareprice.importer.SharePriceImportable;
 import fr.crypto.shareprice.util.PropertyManager;
 import fr.crypto.shareprice.xls.AbstractWorkbookHandler;
 import fr.crypto.shareprice.xls.SharePriceRow;
 
-// TODO log4j
 public class SharePriceImporterStarter extends AbstractWorkbookHandler {
 
 
@@ -22,6 +25,11 @@ public class SharePriceImporterStarter extends AbstractWorkbookHandler {
 
 
 	public static void main(String[] args) throws FileNotFoundException, IOException, InterruptedException {
+		
+		// On supprime les traces 
+		LoggerContext loggerContext = (LoggerContext)LoggerFactory.getILoggerFactory();
+		ch.qos.logback.classic.Logger rootLogger = loggerContext.getLogger(Logger.ROOT_LOGGER_NAME);
+		rootLogger.setLevel(Level.ERROR);
 		
 		// Check args
 		if (args.length == 0 || args[0] == null) {
